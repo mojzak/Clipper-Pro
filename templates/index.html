@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clipper Pro - Twitch & Kick Batch Downloader</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            twitch: '#9146FF',
+            kick: '#53FC18',
+            darkbg: '#0B0E14',
+            darkcard: '#151922',
+            darkcardHover: '#1B212E'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 15% 10%, rgba(145, 70, 255, 0.12) 0%, transparent 40%),
+                  radial-gradient(circle at 85% 90%, rgba(83, 252, 24, 0.08) 0%, transparent 40%),
+                  #0B0E14;
+      min-height: 100vh;
+    }
+    .glow-twitch {
+      box-shadow: 0 0 25px -5px rgba(145, 70, 255, 0.4);
+    }
+    .glow-kick {
+      box-shadow: 0 0 25px -5px rgba(83, 252, 24, 0.3);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="text-slate-100 flex flex-col justify-between p-4 md:p-8">
+
+  <!-- Header -->
+  <header class="max-w-5xl mx-auto w-full flex flex-col md:flex-row items-center justify-between pb-8 gap-4 border-b border-white/10">
+    <div class="flex items-center gap-3">
+      <div class="relative w-11 h-11 rounded-xl bg-gradient-to-tr from-twitch to-kick flex items-center justify-center p-[2px] shadow-lg">
+        <div class="w-full h-full bg-darkbg rounded-[10px] flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+            Clipper Pro
+          </h1>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-twitch/20 text-twitch font-semibold border border-twitch/30">Twitch</span>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-kick/20 text-kick font-semibold border border-kick/30">Kick</span>
+        </div>
+        <p class="text-xs text-slate-400 mt-0.5">Automatisation & conversion par lots • Format Reel 9:16 ou Paysage PC 16:9</p>
+      </div>
+    </div>
+
+    <!-- Free / 0 DHS Badge -->
+    <div class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs text-emerald-400">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="font-semibold">Déploiement 100% Gratuit (0 DHS)</span>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-5xl mx-auto w-full my-8 space-y-8">
+    
+    <!-- Step 1: Format Selector Cards -->
+    <section>
+      <div class="flex items-center justify-between mb-3">
+        <label class="text-sm font-semibold tracking-wide text-slate-300 flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-twitch text-white text-xs flex items-center justify-center font-bold">1</span>
+          Choisissez le format de sortie vidéo
+        </label>
+        <span class="text-xs text-slate-500">Optimisé pour vos réseaux sociaux ou vos montages</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Option 1: Reel 9:16 Blur (Default / Recommended) -->
+        <label class="relative cursor-pointer group">
+          <input type="radio" name="format_mode" value="reel_blur" checked class="peer sr-only">
+          <div class="p-5 rounded-2xl bg-darkcard border border-white/10 peer-checked:border-twitch peer-checked:bg-twitch/10 peer-checked:glow-twitch transition-all duration-200 h-full flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-twitch/30 text-twitch border border-twitch/40">Recommandé</span>
+                <span class="text-xs font-mono text-slate-400">1080 x 1920</span>
+              </div>
+              <h3 class="font-bold text-white text-base mb-1 flex items-center gap-2">
+                📱 Reel 9:16 (Fond Flou Stylé)
+              </h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Vidéo au centre avec arrière-plan animé flouté. Le standard n°1 pour <b>TikTok, Reels et YouTube Shorts</b> sans couper le gameplay.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/5 flex items-center text-[11px] text-slate-400">
+              <svg class="w-4 h-4 mr-1 text-twitch" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              Zéro coupure du stream
+            </div>
+          </div>
+        </label>
+
+        <!-- Option 2: Reel 9:16 Crop -->
+        <label class="relative cursor-pointer group">
+          <input type="radio" name="format_mode" value="reel_crop" class="peer sr-only">
+          <div class="p-5 rounded-2xl bg-darkcard border border-white/10 peer-checked:border-kick peer-checked:bg-kick/10 peer-checked:glow-kick transition-all duration-200 h-full flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Plein écran</span>
+                <span class="text-xs font-mono text-slate-400">1080 x 1920</span>
+              </div>
+              <h3 class="font-bold text-white text-base mb-1 flex items-center gap-2">
+                ✂️ Reel 9:16 (Crop Centré)
+              </h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Recadre le centre de la vidéo en plein écran vertical 9:16. Idéal pour les caméras de streamer ou l'action centrale.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/5 flex items-center text-[11px] text-slate-400">
+              <svg class="w-4 h-4 mr-1 text-kick" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              Remplissage vertical total
+            </div>
+          </div>
+        </label>
+
+        <!-- Option 3: Landscape 16:9 PC -->
+        <label class="relative cursor-pointer group">
+          <input type="radio" name="format_mode" value="landscape" class="peer sr-only">
+          <div class="p-5 rounded-2xl bg-darkcard border border-white/10 peer-checked:border-sky-500 peer-checked:bg-sky-500/10 peer-checked:shadow-lg transition-all duration-200 h-full flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-400 border border-sky-500/30">Format Natif</span>
+                <span class="text-xs font-mono text-slate-400">1920 x 1080</span>
+              </div>
+              <h3 class="font-bold text-white text-base mb-1 flex items-center gap-2">
+                🖥️ Vidéo PC 16:9 (Paysage)
+              </h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Résolution originale 16:9 complète (1080p/720p). Parfait pour regarder sur PC, monter un best-of ou poster sur <b>YouTube</b>.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/5 flex items-center text-[11px] text-slate-400">
+              <svg class="w-4 h-4 mr-1 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              Qualité originale maximale
+            </div>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <!-- Step 2: Multi-Link Input Area -->
+    <section class="bg-darkcard border border-white/10 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+      <div class="flex items-center justify-between mb-3">
+        <label class="text-sm font-semibold tracking-wide text-slate-300 flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-kick text-black text-xs flex items-center justify-center font-bold">2</span>
+          Collez vos liens Twitch & Kick (Un par ligne)
+        </label>
+        <span id="link-counter" class="text-xs text-slate-400 font-mono bg-white/5 px-2.5 py-1 rounded-md">
+          0 lien(s) détecté(s)
+        </span>
+      </div>
+
+      <textarea 
+        id="urls-input" 
+        rows="6" 
+        placeholder="Collez ici autant de liens que vous voulez (Twitch ou Kick) :&#10;https://clips.twitch.tv/WiseFaithfulClips...&#10;https://www.twitch.tv/kamet0/clip/...&#10;https://kick.com/streamer?clip=clip_01..."
+        class="w-full bg-[#0E121A] border border-white/10 rounded-xl p-4 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-twitch focus:ring-1 focus:ring-twitch transition-all resize-none custom-scrollbar"
+      ></textarea>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4">
+        <div class="flex items-center gap-2 text-xs text-slate-400">
+          <span class="inline-block w-2 h-2 rounded-full bg-twitch"></span> Twitch Clips & VODs
+          <span class="inline-block w-2 h-2 rounded-full bg-kick ml-2"></span> Kick Clips & Streams
+        </div>
+
+        <button 
+          id="btn-process" 
+          onclick="submitBatch()" 
+          class="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-twitch to-purple-600 hover:from-purple-500 hover:to-twitch text-white transition-all transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg flex items-center justify-center gap-2"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+          </svg>
+          Lancer le téléchargement groupé
+        </button>
+      </div>
+    </section>
+
+    <!-- Step 3: Batch Results & Live Progress -->
+    <section id="results-section" class="hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>⚡ Traitement en cours</span>
+          <span id="batch-stats" class="text-xs text-slate-400 bg-white/5 px-2.5 py-1 rounded-md font-mono"></span>
+        </h2>
+
+        <a 
+          id="btn-download-all" 
+          href="#" 
+          class="hidden px-4 py-2 rounded-xl bg-kick hover:bg-emerald-400 text-black font-bold text-xs transition-all shadow-md flex items-center gap-1.5"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          📦 Télécharger TOUT en .ZIP
+        </a>
+      </div>
+
+      <!-- Items Grid / List -->
+      <div id="items-list" class="space-y-3"></div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="max-w-5xl mx-auto w-full pt-8 border-t border-white/10 text-center text-xs text-slate-500 flex flex-col md:flex-row items-center justify-between gap-3">
+    <div>
+      Clipper Pro Full Stack • Propulsé par <span class="text-slate-300 font-semibold">yt-dlp</span> & <span class="text-slate-300 font-semibold">FFmpeg</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <span>Prêt pour déploiement <b>0 DHS</b> (Hugging Face Spaces / Render)</span>
+    </div>
+  </footer>
+
+  <!-- Frontend Logic -->
+  <script>
+    const textarea = document.getElementById('urls-input');
+    const counter = document.getElementById('link-counter');
+    let currentBatchId = null;
+    let pollInterval = null;
+
+    // Real-time link counter
+    textarea.addEventListener('input', () => {
+      const urls = extractUrls(textarea.value);
+      counter.textContent = `${urls.length} lien(s) détecté(s)`;
+    });
+
+    function extractUrls(text) {
+      return text
+        .split('\n')
+        .map(l => l.trim())
+        .filter(l => l.startsWith('http://') || l.startsWith('https://'));
+    }
+
+    async function submitBatch() {
+      const urls = extractUrls(textarea.value);
+      if (urls.length === 0) {
+        alert("Veuillez coller au moins un lien valide Twitch ou Kick !");
+        return;
+      }
+
+      const selectedMode = document.querySelector('input[name="format_mode"]:checked').value;
+      const btn = document.getElementById('btn-process');
+      btn.disabled = true;
+      btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Initialisation...`;
+
+      try {
+        const response = await fetch('/api/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ urls: urls, mode: selectedMode })
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.detail || "Erreur lors de la création du lot.");
+        }
+
+        const data = await response.json();
+        currentBatchId = data.batch_id;
+
+        // Show results section
+        document.getElementById('results-section').classList.remove('hidden');
+        btn.innerHTML = `Traitement en cours...`;
+
+        // Start polling
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(pollStatus, 1500);
+        pollStatus(); // Immediate first check
+
+      } catch (err) {
+        alert("Erreur: " + err.message);
+        btn.disabled = false;
+        btn.innerHTML = `Lancer le téléchargement groupé`;
+      }
+    }
+
+    async function pollStatus() {
+      if (!currentBatchId) return;
+
+      try {
+        const res = await fetch(`/api/batch/${currentBatchId}`);
+        if (!res.ok) return;
+
+        const data = await res.json();
+        renderItems(data);
+
+        if (data.is_completed) {
+          clearInterval(pollInterval);
+          const btn = document.getElementById('btn-process');
+          btn.disabled = false;
+          btn.innerHTML = `Lancer un autre lot`;
+
+          // Check if any finished items
+          const finished = data.items.filter(i => i.status === 'done');
+          if (finished.length > 0) {
+            const zipBtn = document.getElementById('btn-download-all');
+            zipBtn.href = `/api/batch/${currentBatchId}/zip`;
+            zipBtn.classList.remove('hidden');
+          }
+        }
+      } catch (e) {
+        console.error("Erreur de suivi:", e);
+      }
+    }
+
+    function renderItems(batch) {
+      const container = document.getElementById('items-list');
+      const stats = document.getElementById('batch-stats');
+      const doneCount = batch.items.filter(i => i.status === 'done').length;
+      stats.textContent = `${doneCount} / ${batch.items.length} terminé(s)`;
+
+      container.innerHTML = batch.items.map((item, idx) => {
+        const isTwitch = item.platform === 'Twitch';
+        const platformBadge = isTwitch 
+          ? `<span class="px-2 py-0.5 text-[10px] font-bold rounded bg-twitch/20 text-twitch border border-twitch/40">Twitch</span>`
+          : `<span class="px-2 py-0.5 text-[10px] font-bold rounded bg-kick/20 text-kick border border-kick/40">Kick</span>`;
+
+        let statusBadge = '';
+        let actionBtn = '';
+
+        if (item.status === 'pending') {
+          statusBadge = `<span class="text-xs text-slate-400">⏳ En attente</span>`;
+        } else if (item.status === 'downloading') {
+          statusBadge = `<span class="text-xs text-sky-400 animate-pulse">⬇️ ${item.message}</span>`;
+        } else if (item.status === 'converting') {
+          statusBadge = `<span class="text-xs text-amber-400 animate-pulse">⚙️ ${item.message}</span>`;
+        } else if (item.status === 'done') {
+          statusBadge = `<span class="text-xs text-emerald-400 font-semibold">✅ ${item.message}</span>`;
+          actionBtn = `
+            <a href="${item.download_url}" download class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-all flex items-center gap-1.5 border border-white/10">
+              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              Télécharger MP4
+            </a>
+          `;
+        } else if (item.status === 'error') {
+          statusBadge = `<span class="text-xs text-rose-400 font-semibold" title="${item.message}">❌ Échec</span>`;
+        }
+
+        return `
+          <div class="p-4 rounded-xl bg-darkcard border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3 overflow-hidden w-full md:w-auto flex-1">
+              <div class="w-12 h-12 rounded-lg bg-black/40 flex-shrink-0 flex items-center justify-center overflow-hidden border border-white/5">
+                ${item.thumbnail ? `<img src="${item.thumbnail}" class="w-full h-full object-cover">` : `<span class="text-lg">🎬</span>`}
+              </div>
+              <div class="truncate flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  ${platformBadge}
+                  <span class="text-xs text-slate-400 truncate">${item.uploader || 'Streamer'}</span>
+                </div>
+                <h4 class="text-sm font-semibold text-white truncate">${item.title || item.url}</h4>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between w-full md:w-auto gap-4">
+              <div class="text-right">
+                ${statusBadge}
+                <div class="w-28 md:w-36 bg-black/40 h-1.5 rounded-full overflow-hidden mt-1.5">
+                  <div class="bg-gradient-to-r from-twitch to-kick h-full transition-all duration-300" style="width: ${item.progress}%"></div>
+                </div>
+              </div>
+              ${actionBtn}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>
